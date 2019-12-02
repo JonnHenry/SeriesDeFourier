@@ -1,64 +1,69 @@
 close all
 clc
 syms t n
-A=[0 1 2];
-f=[t -t+2];
+%Crea variables simbolicas en matlab las cuales pueden ser usadas en su evaluaci�n 
+intervaloAnalisis=[-1 0 1];
 
-f=sym(f);
-T=max(A)-min(A);
-wo=2*pi/T;
- 
+funcion=[1-t^2 1-t^2];
+
+funcion=sym(funcion);
+
+periodo=max(intervaloAnalisis)-min(intervaloAnalisis);
+
+frecuencia=2*pi/periodo;
+
+%subs(funcion,valorVariable) Nos permite evaluar una funci�n con la variable respectiva con el valor de valorVariable 
+
+%expr = str2sym('x + 1') str2sym('x + 1') convierte una cadena a una expresion
+
+%diff(funcion) derivada de una funcion
+%int(funcion, variable, )
+
 Ao=0;
-for i=1:length(f)
-    Ao=Ao+int(f(i),'t',A(i),A(i+1));
+for i=1:length(funcion)
+    Ao=Ao+int(funcion(i),intervaloAnalisis(i),intervaloAnalisis(i+1));
 end
-Ao=simplify(Ao/(T));
+%simplify simplificaci�n algebraica de una expresi�n
+Ao=simplify(Ao/(periodo));
  
 An=0;
-for i=1:length(f)
-    An=An+int(f(i)*cos(n*wo*t),A(i),A(i+1));
+for i=1:length(funcion)
+    An=An+int(funcion(i)*cos(n*frecuencia*t),'t',intervaloAnalisis(i),intervaloAnalisis(i+1));
 end
-An=simplify(2*An/T);
+An=simplify(2*An/periodo);
  
 Bn=0;
-for i=1:length(f)
-    Bn=Bn+int(f(i)*sin(n*wo*t),A(i),A(i+1));
+for i=1:length(funcion)
+    Bn=Bn+int(funcion(i)*sin(n*frecuencia*t),'t',intervaloAnalisis(i),intervaloAnalisis(i+1));
 end
-Bn=simplify(2*Bn/T);
- 
-An = char(An);
-Bn = char(Bn);
-An = simplify(sym(strrep(char(An),'sin(pi*n)','0')));
-Bn=simplify(sym(strrep(char(Bn),'sin(pi*n)','0')));
-An = simplify(sym(strrep(char(An),'cos(pi*n)','(-1)^n')));
-Bn=simplify(sym(strrep(char(Bn),'cos(pi*n)','(-1)^n')));
-An=simplify(sym(strrep(char(An),'sin(2*pi*n)','0')));
-Bn=simplify(sym(strrep(char(Bn),'sin(2*pi*n)','0')));
-An=simplify(sym(strrep(char(An),'cos(2*pi*n)','1')));
-Bn=simplify(sym(strrep(char(Bn),'cos(2*pi*n)','1')));
- 
+Bn=simplify(2*Bn/periodo);
+
 disp('Ao')
-pretty(Ao)
+disp(Ao)
 disp('An')
-pretty(An)
+disp(An)
 disp('Bn')
-pretty(Bn)
+disp(Bn)
+
+
+primerCoeficiente = simplify(An*cos(2*n*pi*t/periodo));
+segundoCoeficiente = simplify(Bn*sin(2*n*pi*t/periodo));
  
-x=linspace(min(A),max(A),1000);
-fx=0;
-for i=1:length(A)-1
-    if mod(i,2)==1
-        fx=fx+((x>=A(i))&(x<=A(i+1))).*subs(f(i),x);
-    else
-        fx=fx+((x>A(i))&(x<A(i+1))).*subs(f(i),x);
-    end
+numArmonicos = 1;
+
+fx = 0;
+fsuma =  primerCoeficiente +segundoCoeficiente;
+
+for i=1:numArmonicos+1
+    fx = fx + subs(fsuma,{n,t},{i,t});
 end
-plot(x,fx,'Linewidth',2); hold on
-plot(x+max(x)-min(x),fx,'Linewidth',2)
-plot(x-max(x)+min(x),fx,'Linewidth',2)
-plot([max(x) max(x)],[fx(1) fx(end)],'Linewidth',2)
-plot([min(x) min(x)],[fx(end) fx(1)],'Linewidth',2)
+fx = fx + Ao;
+
+evalFuncion = subs(fx,{t},{-10:0.1:10});
+
+plot(-10:0.1:10,evalFuncion); hold on
 grid on
 xlabel('\bf TIEMPO');
 ylabel('\bf AMPLITUD');
-title('\bf GRÁFICA DE LA FUNCIÓN');
+title('\bf GR�FICA DE LA FUNCI�N');
+
