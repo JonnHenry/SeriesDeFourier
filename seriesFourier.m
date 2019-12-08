@@ -2,11 +2,13 @@ close all
 clc
 syms t n
 %Crea variables simbolicas en matlab las cuales pueden ser usadas en su evaluaciï¿½n 
-intervaloAnalisis=[-1 0 1];
+interAnalisCadena = '-1 0 1';
 
-funcion=[1-t^2 1-t^2];
+intervaloAnalisis = str2double(split(interAnalisCadena, ' '));
 
-funcion=sym(funcion);
+cadenaFuncion = '-1 1';
+
+funcion=str2sym(split(cadenaFuncion, ' '));
 
 periodo=max(intervaloAnalisis)-min(intervaloAnalisis);
 
@@ -49,7 +51,7 @@ disp(Bn)
 primerCoeficiente = simplify(An*cos(2*n*pi*t/periodo));
 segundoCoeficiente = simplify(Bn*sin(2*n*pi*t/periodo));
  
-numArmonicos = 1;
+numArmonicos = 100;
 
 fx = 0;
 fsuma =  primerCoeficiente +segundoCoeficiente;
@@ -65,5 +67,5 @@ plot(-10:0.1:10,evalFuncion); hold on
 grid on
 xlabel('\bf TIEMPO');
 ylabel('\bf AMPLITUD');
-title('\bf GRï¿½FICA DE LA FUNCIï¿½N');
+title('\bf GRAFICA DE LA FUNCIÓN');
 
