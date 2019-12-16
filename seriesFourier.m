@@ -1,71 +1,28 @@
-close all
-clc
-syms t n
-%Crea variables simbolicas en matlab las cuales pueden ser usadas en su evaluaciï¿½n 
-interAnalisCadena = '-1 0 1';
 
-intervaloAnalisis = str2double(split(interAnalisCadena, ' '));
-
-cadenaFuncion = '-1 1';
-
-funcion=str2sym(split(cadenaFuncion, ' '));
-
-periodo=max(intervaloAnalisis)-min(intervaloAnalisis);
-
-frecuencia=2*pi/periodo;
-
-%subs(funcion,valorVariable) Nos permite evaluar una funciï¿½n con la variable respectiva con el valor de valorVariable 
-
-%expr = str2sym('x + 1') str2sym('x + 1') convierte una cadena a una expresion
-
-%diff(funcion) derivada de una funcion
-%int(funcion, variable, )
-
-Ao=0;
-for i=1:length(funcion)
-    Ao=Ao+int(funcion(i),intervaloAnalisis(i),intervaloAnalisis(i+1));
+function seriesFourier(cantidadArmonicos)
+    clc
+    syms t n
+    hold on
+    intervaloAnalisis = [-1 0 1];
+    x=min(intervaloAnalisis):0.01:max(intervaloAnalisis);
+    evalFunIngreso = subs(t,{t},{x});
+    plot(x,evalFunIngreso,'r');
+    Ck=exp(pi*n*t*1i)*((exp(-pi*n*1i)*(pi*n*1i + 1))/(2*n^2*pi^2) + (exp(pi*n*1i)*(pi*n*1i - 1))/(2*n^2*pi^2));
+    numArmonicos = round(cantidadArmonicos/2);
+    fx = 0;               
+    for i=-numArmonicos:numArmonicos
+        if (i>0) || (i<0)
+            fx = fx + subs(Ck,{n,t},{i,t});
+        end
+    end
+    z=-6:0.01:6;
+    evalFuncion = subs(fx,{t},{z});
+    plot(z,evalFuncion, 'b');
+    title(sprintf('Aproximación de Fourier: %i términos',cantidadArmonicos))
+    grid on
+    xlabel('t'); 
+    ylabel('f(t)')
+    hold off
 end
-%simplify simplificaciï¿½n algebraica de una expresiï¿½n
-Ao=simplify(Ao/(periodo));
- 
-An=0;
-for i=1:length(funcion)
-    An=An+int(funcion(i)*cos(n*frecuencia*t),'t',intervaloAnalisis(i),intervaloAnalisis(i+1));
-end
-An=simplify(2*An/periodo);
- 
-Bn=0;
-for i=1:length(funcion)
-    Bn=Bn+int(funcion(i)*sin(n*frecuencia*t),'t',intervaloAnalisis(i),intervaloAnalisis(i+1));
-end
-Bn=simplify(2*Bn/periodo);
 
-disp('Ao')
-disp(Ao)
-disp('An')
-disp(An)
-disp('Bn')
-disp(Bn)
-
-
-primerCoeficiente = simplify(An*cos(2*n*pi*t/periodo));
-segundoCoeficiente = simplify(Bn*sin(2*n*pi*t/periodo));
- 
-numArmonicos = 100;
-
-fx = 0;
-fsuma =  primerCoeficiente +segundoCoeficiente;
-
-for i=1:numArmonicos+1
-    fx = fx + subs(fsuma,{n,t},{i,t});
-end
-fx = fx + Ao;
-
-evalFuncion = subs(fx,{t},{-10:0.1:10});
-
-plot(-10:0.1:10,evalFuncion); hold on
-grid on
-xlabel('\bf TIEMPO');
-ylabel('\bf AMPLITUD');
-title('\bf GRAFICA DE LA FUNCIÓN');
 
